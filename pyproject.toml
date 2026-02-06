@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "morphofrb"
+version = "0.1.0"
+description = "Morphological classification tools for FRB dynamic spectra (inference + fine-tuning)"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+
+authors = [
+  { name = "Bikash Kharel", email = "bikash.kharel2019@gmail.com" }
+]
+
+
+dependencies = [
+  "torch>=2.0",
+  "torchvision>=0.15",
+  "numpy>=1.23",
+  "pandas>=1.5",
+  "tqdm>=4.60",
+]
+[project.optional-dependencies]
+dev = [
+  "torchinfo>=1.8",
+  "pytest>=7.0",
+  "jupyter",
+]
+
+[project.scripts]
+morphofrb-infer = "morphofrb.inference:main"
+morphofrb-finetune = "morphofrb.fine_tune:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+# Automatically find packages under src/
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+morphofrb = ["assets/*.pth"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
