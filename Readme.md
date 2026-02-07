@@ -12,7 +12,7 @@ Clone the repository and install the package in editable mode:
 ```bash
 git clone https://github.com/kharelb/morphofrb.git
 cd morphofrb
-pip install -e .
+pip install .
 ```
 
 Alternatively, install directly with `pip`:
