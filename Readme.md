@@ -13,7 +13,7 @@ https://doi.org/10.48550/arXiv.2509.06208
 )
 ## Installation
 
-Clone the repository and install the package in editable mode:
+Clone the repository and install the package:
 
 ```bash
 git clone https://github.com/kharelb/morphofrb.git
