@@ -18,7 +18,7 @@ from .weights import get_weights_path
 
 
 
-def fine_tune(out_dir=Path.cwd(), focal_gamma=0, config=Config()):
+def fine_tune(train_dir, val_dir, out_dir=Path.cwd(), focal_gamma=0, config=Config()):
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     out_dir = Path(f"{out_dir}/{timestamp}")
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -37,10 +37,6 @@ def fine_tune(out_dir=Path.cwd(), focal_gamma=0, config=Config()):
     else:
         print(f"--> Implementing binary crossentropy loss as gamma value of focal loss is 0.")
     
-    
-    # Declare training and validation data paths
-    train_dir = config.train_dir
-    val_dir = config.val_dir
     
     
     if config.early_stopping:
@@ -66,24 +62,26 @@ def fine_tune(out_dir=Path.cwd(), focal_gamma=0, config=Config()):
     
     
     # Create the dataloaders
-    train_dl, classes = custom_dataloader.create_dataloader(target_dir=config.train_dir,
+    train_dl, classes = custom_dataloader.create_dataloader(target_dir=train_dir,
                                                             transform=transforms_train,
                                                             set_workers=config.set_workers,
                                                             num_workers=config.num_workers,
                                                             batch_size=config.batch_size,
                                                             w_sampler = config.weighted_sampling,
                                                             shuffle=config.shuffle_train,
-                                                            r_sampling=config.replacement_sampling
+                                                            r_sampling=config.replacement_sampling,
+                                                            pin_memory=config.pin_memory
                                                            )
 
-    val_dl, classes = custom_dataloader.create_dataloader(target_dir=config.val_dir,
+    val_dl, classes = custom_dataloader.create_dataloader(target_dir=val_dir,
                                                           transform=transforms_val,
                                                           set_workers=config.set_workers,
                                                           num_workers=config.num_workers,
                                                           batch_size=config.batch_size,
                                                           w_sampler = False,
                                                           shuffle=config.shuffle_val,
-                                                          r_sampling=False
+                                                          r_sampling=False,
+                                                          pin_memory=config.pin_memory
                                                          )
 
 
@@ -92,7 +90,7 @@ def fine_tune(out_dir=Path.cwd(), focal_gamma=0, config=Config()):
         print("<<< Fine Tuning On Already Fine Tuned Model on CHIME/FRB Catalog 2 >>>")
         model = CustomConvnext(weight=None)
         DEFAULT_MODEL_PATH: Path = get_weights_path()
-        model.load_state_dict(torch.load(DEFAULT_MODEL_PATH, weights_only=True))
+        model.load_state_dict(torch.load(DEFAULT_MODEL_PATH, weights_only=True, map_location=device))
 
     else:
         # The model layers are already frozen by default. 
@@ -176,10 +174,14 @@ def fine_tune(out_dir=Path.cwd(), focal_gamma=0, config=Config()):
 def main(argv=None):
     # Parse the arguments
     parser = ArgumentParser()
+    parser.add_argument('--train_dir', type=str, required=True, help="Directory containing training files" )
+    parser.add_argument('--val_dir', type=str, required=True, help="Directory containing validation files")
     parser.add_argument('--out_dir', type=str, help='Output directory to store the results')
     parser.add_argument('--focal_gamma', type=float, help='Gamma value for Focal Loss')
     parser.add_argument("--config", type=str, help="Path to JSON config file")
     args = parser.parse_args(argv)
+    train_dir = Path(args.train_dir)
+    val_dir = Path(args.val_dir)
     out_dir = Path(args.out_dir) if args.out_dir else Path.cwd()
     focal_gamma = args.focal_gamma if args.focal_gamma else 0
     if args.config:
@@ -191,9 +193,13 @@ def main(argv=None):
     else:
         config = Config()
 
-    fine_tune(out_dir=out_dir, 
-              focal_gamma=focal_gamma, 
-              config=config)
+    fine_tune(
+        train_dir=train_dir,
+        val_dir=val_dir,
+        out_dir=out_dir, 
+        focal_gamma=focal_gamma, 
+        config=config
+        )
 
     return 0
     

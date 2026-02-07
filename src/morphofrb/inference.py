@@ -27,10 +27,9 @@ def typewriter(text, delay=0.001):
         sys.stdout.flush()
         time.sleep(delay)
     print() # Add a newline at the end
-DEFAULT_MODEL_PATH: Path = get_weights_path()
 
 @torch.inference_mode()
-def predict(model_state_dict_path=DEFAULT_MODEL_PATH,
+def predict(model_state_dict_path=None,
             files_path=Path.cwd(),
             save_prediction_json=False,
             out_dir=None,
@@ -43,8 +42,11 @@ def predict(model_state_dict_path=DEFAULT_MODEL_PATH,
         save_file_name = f"{str(Path(out_dir))}/prediction_{timestamp}"
     else:
         save_file_name = f"prediction_{timestamp}"
+
+    if model_state_dict_path is None:
+        model_state_dict_path = get_weights_path()
     model = CustomConvnext(weight=None)
-    model.load_state_dict(torch.load(model_state_dict_path, weights_only=True))
+    model.load_state_dict(torch.load(model_state_dict_path, weights_only=True, map_location=device))
     model.eval()
     print(f"Loading model to: {device} for inference...")
     model.to(device)
@@ -86,7 +88,7 @@ def main(argv=None):
 
     args = parser.parse_args(argv)
 
-    state_dict_path = args.state_dict if args.state_dict else DEFAULT_MODEL_PATH
+    state_dict_path = args.state_dict
     files_path = args.files_path if args.files_path else Path.cwd()
     save_prediction = True if args.save_prediction else False
     out_dir = args.out_dir if args.out_dir else Path.cwd()

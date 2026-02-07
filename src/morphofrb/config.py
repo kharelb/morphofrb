@@ -11,12 +11,10 @@ class Config:
     early_stopping: bool = True
     patience: int = 20
     weighted_sampling: bool = True
-    fine_tune_chime_cattwo: bool = False # Fine tune on already fine tuned on cat-2 data
+    fine_tune_chime_cattwo: bool = False # Fine tune on already fine tuned with cat-2 data
     replacement_sampling: bool = True  # Replacement sampling or not with weighted sampler
     shuffle_train: bool = False   # Set it to False if WeightedRandomSampler enabled on dataloader
     shuffle_val: bool = False
-    train_dir: str = "/scratch/bk0055/frb_rnr_2025_jan_22/dataset/train"#'../dataset/trai'
-    val_dir: str = "/scratch/bk0055/frb_rnr_2025_jan_22/dataset/validation"#'../dataset/validation'
     model_weight: str = "DEFAULT"
     learning_rate_scheduler: bool = True
     scheduler_gamma: float = 0.1
@@ -24,6 +22,6 @@ class Config:
     print_training_details: bool = True
     feature_layers_to_unfreeze: Dict[int, List[int]] = field(default_factory=lambda: {0: [0]})
     unfreeze_classification_layer: bool = True
-    
-    set_workers: bool = True   # Set the number of cores for data loading(setting up workers on mac gives error)
-    num_workers: int = 16     # Intended for HPC use
+    set_workers: bool = False   # Set the number of cores for data loading(setting up workers on mac gives error)
+    num_workers: int = 8     # Intended for HPC use (Base on number of cpu cores available.)
+    pin_memory: bool = False # For mac MPS set it to False

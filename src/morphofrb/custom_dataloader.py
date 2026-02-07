@@ -15,7 +15,7 @@ def create_dataloader(
 		set_workers: bool = False,
 		r_sampling: bool = True,
 		w_sampler: bool = False,
-		pin_memory: bool = True
+		pin_memory: bool = False
 		):
     """
 	Creates a custom dataloader for numpy data set. 

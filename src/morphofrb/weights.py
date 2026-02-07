@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import requests
 from pathlib import Path
 
 
@@ -20,6 +21,14 @@ def _try_packaged_asset(filename: str) -> Path | None:
     except Exception:
         pass
     return None
+
+def download_file(url, local_path):
+    # 'stream=True' ensures we don't load the whole file into memory at once
+    with requests.get(url, stream=True) as r:
+        r.raise_for_status()  # Check for HTTP errors (404, 500, etc.)
+        with open(local_path, 'wb') as f:
+            for chunk in r.iter_content(chunk_size=8192): 
+                f.write(chunk)
 
 
 def get_weights_path(
@@ -62,9 +71,8 @@ def get_weights_path(
         return Path(downloaded)
 
     except Exception:
-        import urllib.request
 
         url = f"https://huggingface.co/{hf_repo}/resolve/{revision}/{filename}"
         print(f"[morphofrb] Downloading model weights from:\n  {url}")
-        urllib.request.urlretrieve(url, local_path)
+        download_file(url, local_path)
         return local_path
