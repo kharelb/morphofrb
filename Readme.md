@@ -7,6 +7,7 @@ The current model has not been evaluated on FRBs from other radio telescopes, bu
 We exprimented with various state of the art computer vision models including vision transformers but for current data set ConvNext outperformed them all. 
 
 For more details go through the paper:
+
 [![DOI](https://img.shields.io/badge/DOI-10.3847%2FXXXXX-blue)](https://doi.org/10.3847/1538-4357/ae323c)
 [![arXiv](https://img.shields.io/badge/arXiv-25XX.XXXXX-B31B1B.svg)](
 https://doi.org/10.48550/arXiv.2509.06208
